@@ -10,9 +10,8 @@ from ask_sdk_model import Response
 
 # Set your OpenAI API key
 client = OpenAI(
-    api_key="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",
+    api_key="[api_key]",
 )
-#openai.api_key = "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"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
