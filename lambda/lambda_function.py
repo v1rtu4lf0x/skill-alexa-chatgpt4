@@ -1,6 +1,7 @@
 import logging
 import ask_sdk_core.utils as ask_utils
 import openai
+from openai import OpenAI
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
@@ -8,12 +9,15 @@ from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 
 # Set your OpenAI API key
-openai.api_key = "substitua-pela-sua-chave-da-openai"
+client = OpenAI(
+    api_key="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",
+)
+#openai.api_key = "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"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-messages = [{"role": "system", "content": "Você é uma assistente muito útil. Por favor, responda de forma clara e concisa em Português do Brasil."}]
+messages = [{"role": "system", "content": "resposta em pt-br"}]
 
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -24,7 +28,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Bem vindo ao Chat 'Gepetê Quatro' da 'Open ei ai'! Qual a sua pergunta?"
+        speak_output = "Bem vindo ao Chat 'Gepetê Quatro'! Qual a sua pergunta?"
 
         return (
             handler_input.response_builder
@@ -92,16 +96,20 @@ def generate_gpt_response(query):
         messages.append(
             {"role": "user", "content": query},
         )
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            #model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=messages,
-            max_tokens=1000,
+            #max_tokens=1000,
+            max_tokens=2048,
             n=1,
             stop=None,
-            temperature=0.5
+            temperature=0
+            #request_timeout=7
         )
-        reply = response['choices'][0]['message']['content'].strip()
-        messages.append({"role": "assistant", "content": reply})
+        #reply = response['choices'][0]['message']['content'].strip()
+        reply = response.choices[0].message.content
+        messages.append({"role": "assistant", "content": reply.strip()})
         return reply
     except Exception as e:
         return f"Erro ao gerar resposta: {str(e)}"
